@@ -1,7 +1,7 @@
 /******************
-Name:
-ID:
-Assignment:
+Name: Gal Neeman
+ID: 331981365
+Assignment: ex4
 *******************/
 #include <stdio.h>
 #include <string.h>
@@ -60,9 +60,19 @@ int main()
     } while (task != 6);
 }
 
+int findRobotPaths(int row, int col) {
+    //if it's on the edge there is only 1 direction to go
+    if (row == 0 || col == 0) return 1;
+    return findRobotPaths(row-1, col) + findRobotPaths(row, col-1);
+}
+
 void task1_robot_paths()
 {
-    // Todo
+    int col,row, numOfPaths = 0;
+    printf("Please enter the coordinates of the robot (column, row):\n");
+    scanf(" %d %d",&col,&row);
+    if (col >= 0 && row >= 0) numOfPaths = findRobotPaths(row, col);
+    printf("The total number of paths the robot can take to reach home is: %d\n", numOfPaths);
 }
 
 void task2_human_pyramid()
