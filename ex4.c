@@ -75,9 +75,35 @@ void task1_robot_paths()
     printf("The total number of paths the robot can take to reach home is: %d\n", numOfPaths);
 }
 
-void task2_human_pyramid()
-{
-    // Todo
+float calcTotalWeight(int row, int col, float pyr[5][5]) {
+    if (row == 0) return pyr[0][0];
+    if (col == 0) return pyr[row][col] + calcTotalWeight(row-1, col, pyr)/2;
+    if (col == row) return pyr[row][col] + calcTotalWeight(row-1, col - 1, pyr)/2;
+    return pyr[row][col] + (calcTotalWeight(row-1, col-1, pyr) + calcTotalWeight(row-1, col, pyr))/2;
+}
+
+void task2_human_pyramid() {
+    float pyramid[5][5];
+    printf("Please enter the weights of the cheerleaders:\n");
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j <= i ; j++) {
+            scanf(" %f",&pyramid[i][j]);
+            if (pyramid[i][j] < 0) {
+                printf("Negative weights are not supported.\n");
+                return;
+            }
+        }
+    }
+    printf("\n");
+    for (int i = 0; i < 5; i++) {
+        for (int j = 0; j <= i ; j++) {
+            printf("%.02f ", calcTotalWeight(i, j, pyramid));
+        }
+        printf("\n");
+    }
+
+
+
 }
 
 void task3_parenthesis_validator()
