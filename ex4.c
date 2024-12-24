@@ -254,7 +254,7 @@ struct crossword_instructions {
 };
 
 //a function to place a word in a specific place
-void place_word(int row, int col, int length, int direction[2], int size, char word[length],
+void place_word(int row, int col, int length, int direction[DIRECTIONS], int size, char word[length],
                 char solution[size][size], int counter) {
     if (counter == length) return;
     solution[row][col] = word[counter];
@@ -262,7 +262,8 @@ void place_word(int row, int col, int length, int direction[2], int size, char w
 }
 
 //a function to check if it's possible to place a word in a specific place
-int can_place_word(int row, int col, int requiredLength, int length, int direction[2], int size, char word[length],
+int can_place_word(int row, int col, int requiredLength, int length, int direction[DIRECTIONS], int size,
+                   char word[length],
                    char solution[size][size], int wordIndex, int numOfSlots, int usedWords[numOfSlots], int counter) {
     if (counter == length) return 1;
     if (requiredLength != length || usedWords[wordIndex] != 0 ||
@@ -273,7 +274,7 @@ int can_place_word(int row, int col, int requiredLength, int length, int directi
 }
 
 //a function to remove a word
-void remove_word(int row, int col, int length, int direction[2], int size,
+void remove_word(int row, int col, int length, int direction[DIRECTIONS], int size,
                  char solution[size][size], int counter) {
     if (counter == length) return;
     solution[row][col] = '\0';
@@ -294,7 +295,7 @@ void print_crossword(int size, char solution[size][size]) {
 
 //the recursive function to solve the crossword(pretty similar to the queen's battle function)
 int crossword_solver(int size, int numOfWords, int numOfSlots, char solution[size][size],
-                     char dictionary[numOfWords][15], int counter, int usedWords[numOfSlots],
+                     char dictionary[numOfWords][MAX_WORD_SIZE], int counter, int usedWords[numOfSlots],
                      int wordIndex, struct crossword_instructions gridInstructions[numOfSlots]) {
     if (counter == numOfSlots) return 1;
     if (wordIndex == numOfWords) return 0;
@@ -343,7 +344,8 @@ void task5_crossword_generator() {
     }
     printf("Please enter the number of words in the dictionary:\n");
     while (scanf(" %d", &numOfWords) && numOfWords < numOfSlots) {
-        printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n", numOfSlots);
+        printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n",
+            numOfSlots);
     }
     char dictionary[numOfWords][MAX_WORD_SIZE];
     for (int i = 0; i < numOfWords; i++) {
@@ -359,7 +361,8 @@ void task5_crossword_generator() {
     for (int i = 0; i < numOfWords; i++) {
         scanf(" %s", &dictionary[i]);
     }
-    if (crossword_solver(size, numOfWords, numOfSlots, solution, dictionary, 0, usedWords, 0, gridInstructions)) {
+    if (crossword_solver(size, numOfWords, numOfSlots, solution, dictionary, 0, usedWords, 0,
+        gridInstructions)) {
         print_crossword(size, solution);
     } else printf("This crossword cannot be solved.\n");
 }
