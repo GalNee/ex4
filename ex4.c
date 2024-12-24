@@ -9,7 +9,7 @@ Assignment: ex4
 #define PYRAMID_SIZE 5
 #define BRACKETS 4
 #define DIRECTIONS 2
-#define MAX_WORD_SIZE 15
+#define MAX_WORD_SIZE 16
 
 
 void task1_robot_paths();
