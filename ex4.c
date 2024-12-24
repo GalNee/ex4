@@ -359,7 +359,7 @@ void task5_crossword_generator() {
     }
     printf("Please enter the words for the dictionary:\n");
     for (int i = 0; i < numOfWords; i++) {
-        scanf(" %s", &dictionary[i]);
+        scanf(" %s", dictionary[i]);
     }
     if (crossword_solver(size, numOfWords, numOfSlots, solution, dictionary, 0, usedWords, 0,
         gridInstructions)) {
