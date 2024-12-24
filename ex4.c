@@ -98,7 +98,7 @@ void task2_human_pyramid() {
             }
         }
     }
-    printf("\n");
+    printf("\nThe total weight on each cheerleader is:\n");
     for (int i = 0; i < PYRAMID_SIZE; i++) {
         for (int j = 0; j <= i; j++) {
             printf("%.02f ", calc_total_weight(i, j, pyramid));
@@ -115,35 +115,45 @@ int find_index(int size, char arr[size], char value, int counter) {
 }
 
 int is_patenthesis_valid(char chr, char starting_brackets[BRACKETS], char ending_brackets[BRACKETS],
-                         int opening_bracket_index) {
+                         int opening_bracket_index, int need_checking) {
     //if the line ends and there is an unclosed bracket returns false
-    if (chr == '\n') return opening_bracket_index == -1;
-
-    //if there is a closing bracket...
-    if (find_index(BRACKETS, ending_brackets, chr, 0) != -1)
-        //if no opening bracket before or the wrong type returns false
-        return opening_bracket_index != -1 && chr == ending_brackets[opening_bracket_index];
-
-    //input another char
+    if (chr == '\n') return opening_bracket_index == -1 && need_checking;
     char next_chr;
+    if (need_checking) {
+        //if there is a closing bracket...
+        if (find_index(BRACKETS, ending_brackets, chr, 0) != -1) {
+            //if no opening bracket before or the wrong type stops checking and just reads until the end and returns 0
+            if (opening_bracket_index != -1 && chr == ending_brackets[opening_bracket_index]) return 1;
+            need_checking = 0;
+        }
+
+
+        int starting_index = find_index(BRACKETS, starting_brackets, chr, 0);
+        if (starting_index != -1) {
+            //input another char
+            scanf("%c", &next_chr);
+            //if next character is the ending there is no need to check there is no continuation
+            if (next_chr == '\n') return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets,
+                                                              starting_index, need_checking);
+            //checking the inner brackets and only then the outer ones(uses * instead of && to read to whole input)
+            return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets, starting_index, need_checking) *
+                   is_patenthesis_valid('a', starting_brackets, ending_brackets, opening_bracket_index,
+                       need_checking);
+        }
+    }
     scanf("%c", &next_chr);
-
-    int starting_index = find_index(BRACKETS, starting_brackets, chr, 0);
-    if (starting_index != -1)
-        //checking the inner brackets and only then the outer ones(uses * instead of && to read to whole input)
-        return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets, starting_index) *
-               is_patenthesis_valid('a', starting_brackets, ending_brackets, opening_bracket_index);
-
-    return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets, opening_bracket_index);
+    return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets, opening_bracket_index, need_checking);
 }
 
 void task3_parenthesis_validator() {
     char chr, starting_brackets[] = "<([{", ending_brackets[] = ">)]}";
     printf("Please enter a term for validation:\n");
     scanf(" %c", &chr);
-    int isBalanced = is_patenthesis_valid(chr, starting_brackets, ending_brackets, -1);
+    int isBalanced = is_patenthesis_valid(chr, starting_brackets, ending_brackets, -1, 1);
     if (isBalanced) printf("The parentheses are balanced correctly.\n");
-    else printf("The parentheses are not balanced correctly.\n");
+    else {
+        printf("The parentheses are not balanced correctly.\n");
+    }
 }
 
 //a function that returns true if there is another queen in the same column
@@ -229,7 +239,7 @@ void task4_queens_battle() {
     char grid[size][size], colors[size], solution[size][size];
     int intGrid[size][size], colorOcc[size];
     init_solution_grid(size, solution);
-    printf("Please enter the %d*%d puzzle board:\n", size, size);
+    printf("Please enter a %d*%d puzzle board:\n", size, size);
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             scanf(" %c", &grid[i][j]);
@@ -242,6 +252,7 @@ void task4_queens_battle() {
     }
     get_int_grid(size, grid, intGrid, colors, 0, 0);
     if (solution_queens_battle(size, intGrid, solution, 0, 0, colorOcc)) {
+        printf("Solution:\n");
         printBoard(size, solution);
     } else printf("This puzzle cannot be solved.\n");
 }
@@ -345,7 +356,7 @@ void task5_crossword_generator() {
     printf("Please enter the number of words in the dictionary:\n");
     while (scanf(" %d", &numOfWords) && numOfWords < numOfSlots) {
         printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n",
-            numOfSlots);
+               numOfSlots);
     }
     char dictionary[numOfWords][MAX_WORD_SIZE];
     for (int i = 0; i < numOfWords; i++) {
@@ -362,7 +373,7 @@ void task5_crossword_generator() {
         scanf(" %s", dictionary[i]);
     }
     if (crossword_solver(size, numOfWords, numOfSlots, solution, dictionary, 0, usedWords, 0,
-        gridInstructions)) {
+                         gridInstructions)) {
         print_crossword(size, solution);
     } else printf("This crossword cannot be solved.\n");
 }
