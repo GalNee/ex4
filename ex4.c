@@ -222,8 +222,8 @@ void get_int_grid(int size, char grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], int int
 void printBoard(int size, char solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED]) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            if (solution[i][j] == '\0') printf("*");
-            else printf("%c", solution[i][j]);
+            if (solution[i][j] == '\0') printf("* ");
+            else printf("X ");
         }
         printf("\n");
     }
@@ -233,8 +233,9 @@ void task4_queens_battle() {
     int size, counter = 0;
     printf("Please enter the board dimensions:\n");
     scanf(" %d", &size);
-    char grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], colors[MAX_QUEEN_GREED], solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED];
-    int intGrid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], colorOcc[MAX_QUEEN_GREED];
+    char grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], colors[MAX_QUEEN_GREED],
+    solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED] = {'\0'};
+    int intGrid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], colorOcc[MAX_QUEEN_GREED] = {0};
     printf("Please enter a %d*%d puzzle board:\n", size, size);
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
@@ -335,7 +336,7 @@ void task5_crossword_generator() {
     scanf(" %d", &size);
     printf("Please enter the number of slots in the crossword:\n");
     scanf(" %d", &numOfSlots);
-    char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED];
+    char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED] = {'\0'};
     struct crossword_instructions gridInstructions[MAXIMUM_SLOTS];
     printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
     for (int i = 0; i < numOfSlots; i++) {
@@ -354,7 +355,7 @@ void task5_crossword_generator() {
                numOfSlots);
     }
     char dictionary[MAXIMUM_SLOTS][MAX_WORD_SIZE];
-    int usedWords[MAXIMUM_SLOTS];
+    int usedWords[MAXIMUM_SLOTS] = {0};
     printf("Please enter the words for the dictionary:\n");
     for (int i = 0; i < numOfWords; i++) {
         scanf(" %s", dictionary[i]);
