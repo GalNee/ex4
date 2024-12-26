@@ -9,6 +9,9 @@ Assignment: ex4
 #define PYRAMID_SIZE 5
 #define BRACKETS 4
 #define DIRECTIONS 2
+#define MAX_QUEEN_GREED 20
+#define MAX_CROSSWORD_GREED 30
+#define MAXIMUM_SLOTS 100
 #define MAX_WORD_SIZE 16
 
 
@@ -108,7 +111,7 @@ void task2_human_pyramid() {
 }
 
 //finds the index of a value in an array, if it's not in the array it returns -1;
-int find_index(int size, char arr[size], char value, int counter) {
+int find_index(int size, char arr[], char value, int counter) {
     if (counter == size) return -1;
     if (arr[counter] == value) return counter;
     return find_index(size, arr, value, counter + 1);
@@ -133,12 +136,11 @@ int is_patenthesis_valid(char chr, char starting_brackets[BRACKETS], char ending
             //input another char
             scanf("%c", &next_chr);
             //if next character is the ending there is no need to check there is no continuation
-            if (next_chr == '\n') return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets,
-                                                              starting_index, need_checking);
-            //checking the inner brackets and only then the outer ones(uses * instead of && to read to whole input)
-            return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets, starting_index, need_checking) *
+            if (next_chr == '\n') return 0;
+            return is_patenthesis_valid(next_chr, starting_brackets, ending_brackets, starting_index, need_checking) &&
+                   //i just enter 'a' as a dummy value to read the next char
                    is_patenthesis_valid('a', starting_brackets, ending_brackets, opening_bracket_index,
-                       need_checking);
+                                        need_checking);
         }
     }
     scanf("%c", &next_chr);
@@ -157,14 +159,14 @@ void task3_parenthesis_validator() {
 }
 
 //a function that returns true if there is another queen in the same column
-int is_a_queen_in_column(int size, char solution[size][size], int row, int col) {
+int is_a_queen_in_column(int size, char solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED], int row, int col) {
     if (row == size) return 0;
     if (solution[row][col] == 'X') return 1;
     return is_a_queen_in_column(size, solution, row + 1, col);
 }
 
 //a function that returns true if there is a queen adjacent to the queen the program wants to place(sorry, it's ugly)
-int is_a_queen_adjacent(int size, char solution[size][size], int row, int col) {
+int is_a_queen_adjacent(int size, char solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED], int row, int col) {
     if (row == 0 && col == 0) return solution[row + 1][col + 1] == 'X';
     if (row == size - 1 && col == size - 1) return solution[row - 1][col - 1] == 'X';
     if (row == 0 && col == size - 1) return solution[row + 1][col - 1] == 'X';
@@ -179,14 +181,16 @@ int is_a_queen_adjacent(int size, char solution[size][size], int row, int col) {
 }
 
 //a function that returns true if a queen can be placed in a specific place based on the rules of the game
-int can_place_queen(int size, int grid[size][size], char solution[size][size], int row, int col, int colors[size]) {
+int can_place_queen(int size, int grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED],
+                    char solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED], int row, int col, int colors[MAX_QUEEN_GREED]) {
     return !is_a_queen_in_column(size, solution, 0, col) && colors[grid[row][col]] == 0 &&
            !is_a_queen_adjacent(size, solution, row, col) && solution[row][col] == 0;
 }
 
 //the recursive function that finds the solution
-int solution_queens_battle(int size, int grid[size][size], char solution[size][size], int row, int col,
-                           int colors[size]) {
+int solution_queens_battle(int size, int grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED],
+                           char solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED], int row, int col,
+                           int colors[MAX_QUEEN_GREED]) {
     if (row == size) return 1;
 
     /*if there is no place for a queen in a row it will return to the previous row and if there is no previous row it
@@ -205,7 +209,8 @@ int solution_queens_battle(int size, int grid[size][size], char solution[size][s
 
 
 //changes the grid from a char array to an int array with numbers from 0 to size-1
-void get_int_grid(int size, char grid[size][size], int intGrid[size][size], char colors[size], int row, int col) {
+void get_int_grid(int size, char grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], int intGrid[MAX_QUEEN_GREED][MAX_QUEEN_GREED],
+                  char colors[MAX_QUEEN_GREED], int row, int col) {
     if (row == size) return;
     if (col == size) get_int_grid(size, grid, intGrid, colors, row + 1, 0);
     else {
@@ -214,15 +219,7 @@ void get_int_grid(int size, char grid[size][size], int intGrid[size][size], char
     }
 }
 
-void init_solution_grid(int size, char solution[size][size]) {
-    for (int i = 0; i < size; i++) {
-        for (int j = 0; j < size; j++) {
-            solution[i][j] = '\0';
-        }
-    }
-}
-
-void printBoard(int size, char solution[size][size]) {
+void printBoard(int size, char solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED]) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
             if (solution[i][j] == '\0') printf("*");
@@ -236,9 +233,8 @@ void task4_queens_battle() {
     int size, counter = 0;
     printf("Please enter the board dimensions:\n");
     scanf(" %d", &size);
-    char grid[size][size], colors[size], solution[size][size];
-    int intGrid[size][size], colorOcc[size];
-    init_solution_grid(size, solution);
+    char grid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], colors[MAX_QUEEN_GREED], solution[MAX_QUEEN_GREED][MAX_QUEEN_GREED];
+    int intGrid[MAX_QUEEN_GREED][MAX_QUEEN_GREED], colorOcc[MAX_QUEEN_GREED];
     printf("Please enter a %d*%d puzzle board:\n", size, size);
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
@@ -265,8 +261,8 @@ struct crossword_instructions {
 };
 
 //a function to place a word in a specific place
-void place_word(int row, int col, int length, int direction[DIRECTIONS], int size, char word[length],
-                char solution[size][size], int counter) {
+void place_word(int row, int col, int length, int direction[DIRECTIONS], int size, char word[MAX_WORD_SIZE],
+                char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED], int counter) {
     if (counter == length) return;
     solution[row][col] = word[counter];
     place_word(row + direction[1], col + direction[0], length, direction, size, word, solution, counter + 1);
@@ -274,8 +270,8 @@ void place_word(int row, int col, int length, int direction[DIRECTIONS], int siz
 
 //a function to check if it's possible to place a word in a specific place
 int can_place_word(int row, int col, int requiredLength, int length, int direction[DIRECTIONS], int size,
-                   char word[length],
-                   char solution[size][size], int wordIndex, int numOfSlots, int usedWords[numOfSlots], int counter) {
+                   char word[MAX_WORD_SIZE], char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED], int wordIndex,
+                   int numOfSlots, int usedWords[MAXIMUM_SLOTS], int counter) {
     if (counter == length) return 1;
     if (requiredLength != length || usedWords[wordIndex] != 0 ||
         (solution[row][col] != '\0' && solution[row][col] != word[counter]))
@@ -286,14 +282,14 @@ int can_place_word(int row, int col, int requiredLength, int length, int directi
 
 //a function to remove a word
 void remove_word(int row, int col, int length, int direction[DIRECTIONS], int size,
-                 char solution[size][size], int counter) {
+                 char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED], int counter) {
     if (counter == length) return;
     solution[row][col] = '\0';
     remove_word(row + direction[1], col + direction[0], length, direction, size, solution, counter + 1);
 }
 
 //a function to print the crossword
-void print_crossword(int size, char solution[size][size]) {
+void print_crossword(int size, char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED]) {
     for (int i = 0; i < size; i++) {
         printf("|");
         for (int j = 0; j < size; j++) {
@@ -305,9 +301,9 @@ void print_crossword(int size, char solution[size][size]) {
 }
 
 //the recursive function to solve the crossword(pretty similar to the queen's battle function)
-int crossword_solver(int size, int numOfWords, int numOfSlots, char solution[size][size],
-                     char dictionary[numOfWords][MAX_WORD_SIZE], int counter, int usedWords[numOfSlots],
-                     int wordIndex, struct crossword_instructions gridInstructions[numOfSlots]) {
+int crossword_solver(int size, int numOfWords, int numOfSlots, char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED],
+                     char dictionary[MAXIMUM_SLOTS][MAX_WORD_SIZE], int counter, int usedWords[MAXIMUM_SLOTS],
+                     int wordIndex, struct crossword_instructions gridInstructions[MAXIMUM_SLOTS]) {
     if (counter == numOfSlots) return 1;
     if (wordIndex == numOfWords) return 0;
     if (can_place_word(gridInstructions[counter].row, gridInstructions[counter].col,
@@ -339,9 +335,8 @@ void task5_crossword_generator() {
     scanf(" %d", &size);
     printf("Please enter the number of slots in the crossword:\n");
     scanf(" %d", &numOfSlots);
-    char solution[size][size];
-    init_solution_grid(size, solution);
-    struct crossword_instructions gridInstructions[numOfSlots];
+    char solution[MAX_CROSSWORD_GREED][MAX_CROSSWORD_GREED];
+    struct crossword_instructions gridInstructions[MAXIMUM_SLOTS];
     printf("Please enter the details for each slot (Row, Column, Length, Direction):\n");
     for (int i = 0; i < numOfSlots; i++) {
         char dir;
@@ -358,16 +353,8 @@ void task5_crossword_generator() {
         printf("The dictionary must contain at least %d words. Please enter a valid dictionary size:\n",
                numOfSlots);
     }
-    char dictionary[numOfWords][MAX_WORD_SIZE];
-    for (int i = 0; i < numOfWords; i++) {
-        for (int j = 0; j < MAX_WORD_SIZE; j++) {
-            dictionary[i][j] = '\0';
-        }
-    }
-    int usedWords[numOfWords];
-    for (int i = 0; i < numOfWords; i++) {
-        usedWords[i] = 0;
-    }
+    char dictionary[MAXIMUM_SLOTS][MAX_WORD_SIZE];
+    int usedWords[MAXIMUM_SLOTS];
     printf("Please enter the words for the dictionary:\n");
     for (int i = 0; i < numOfWords; i++) {
         scanf(" %s", dictionary[i]);
